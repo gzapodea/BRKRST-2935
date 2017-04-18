@@ -195,7 +195,7 @@ def execute_ucsd_workflow(UCSD_key, workflow_name):
     print(response.text)
 
 
-def get_service_ticket():
+def get_service_ticket_apic_em():
     """
     create the authorization ticket required to access APIC-EM
     Call to APIC-EM - /ticket
@@ -239,12 +239,12 @@ def locate_client_apic_em(client_IP, ticket):
         interface_name = host_info['connectedInterfaceName']
         device_id = host_info['connectedNetworkDeviceId']
         vlan_Id = host_info['vlanId']
-        hostname = get_hostname_id(device_id, ticket)[0]
+        hostname = get_hostname_id_apic_em(device_id, ticket)[0]
         print('The IP address ', client_IP, ' is connected to the network device ', hostname, ',  interface ', interface_name)
     return hostname, interface_name, vlan_Id
 
 
-def get_hostname_id(device_id, ticket):
+def get_hostname_id_apic_em(device_id, ticket):
     """
     Find out the hostname of the network device with the specified device ID
     Call to APIC-EM - network-device/{id}
@@ -329,7 +329,7 @@ def pi_deploy_cli_template(device_id, template_name, variable_value):
     return job_name
 
 
-def get_job_status(job_name):
+def get_job_status_pi(job_name):
     """
     Get job status in PI
     Call to Prime Infrastructure - /webacs/api/v1/data/JobSummary, filtered by the job name, will provide the job id
@@ -506,14 +506,14 @@ def main():
 
     # get UCSD API key
 
-    ucs_key = get_ucsd_api_key()
+    # ucs_key = get_ucsd_api_key()
 
     # execute UCSD workflow to connect VDI to VLAN, power on VDI
-    execute_ucsd_workflow(ucs_key, UCSD_CONNECT_FLOW)
+    # execute_ucsd_workflow(ucs_key, UCSD_CONNECT_FLOW)
 
     # get the APIC-EM auth ticket
 
-    EM_ticket = get_service_ticket()
+    EM_ticket = get_service_ticket_apic_em()
 
     # client IP address - DNS lookup if available
 
@@ -548,9 +548,9 @@ def main():
     # check for job status
 
     time.sleep(60)  #  time delay to allow PI de deploy the jobs
-    dc_job_status = get_job_status(PI_dc_job_name)
+    dc_job_status = get_job_status_pi(PI_dc_job_name)
     print('DC CLI template deployment status: ', dc_job_status)
-    remote_job_status = get_job_status(PI_remote_job_name)
+    remote_job_status = get_job_status_pi(PI_remote_job_name)
     print('Remote CLI template deployment status: ', remote_job_status)
 
     #  create ASAv outside interface ACL to allow traffic
@@ -604,9 +604,9 @@ def main():
     ]
     PI_remote_job_name = pi_deploy_cli_template(PI_remote_device_id, template_name, variable_value)
     time.sleep(60)  #  time delay to allow PI de deploy the jobs
-    dc_job_status = get_job_status(PI_dc_job_name)
+    dc_job_status = get_job_status_pi(PI_dc_job_name)
     print('DC router restore configurations status: ', dc_job_status)
-    remote_job_status = get_job_status(PI_remote_job_name)
+    remote_job_status = get_job_status_pi(PI_remote_job_name)
     print('Remote router restore configurations status: ', remote_job_status)
 
     # delete ASAv line 1 ACL created to allow traffic
