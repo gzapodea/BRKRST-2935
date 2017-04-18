@@ -16,3 +16,5 @@ This session will showcase the use of the open REST API's available in
     Tropo
 
 to dynamically provision secured remote access to Enterprise resources for a third party entity. The code will configure firewalls, routers, switches, and Data Center compute resources.
+
+CLI Templates to be deployed to the DC and Remote router are included.
