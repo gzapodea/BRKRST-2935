@@ -514,7 +514,7 @@ def main():
 
     # get the APIC-EM auth ticket
 
-    EM_ticket = get_service_ticket_apic_em()
+    EM_TICKET = get_service_ticket_apic_em()
 
     # client IP address - DNS lookup if available
 
@@ -522,7 +522,7 @@ def main():
 
     # locate IPD in the environment using APIC-EM
 
-    client_connected = locate_client_apic_em(client_IP, EM_ticket)
+    client_connected = locate_client_apic_em(client_IP, EM_TICKET)
 
     #  deploy DC router CLI template
 
