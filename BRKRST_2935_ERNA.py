@@ -91,6 +91,7 @@ def find_spark_room_id(room_name):
     url = SPARK_URL + '/rooms'
     header = {'content-type': 'application/json', 'authorization': SPARK_AUTH}
     room_response = requests.get(url, data=json.dumps(payload), headers=header, verify=False)
+    print(room_response)
     room_list_json = room_response.json()
     room_list = room_list_json['items']
     for rooms in room_list:
