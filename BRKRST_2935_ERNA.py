@@ -262,7 +262,7 @@ def get_hostname_id_apic_em(device_id, ticket):
     return hostname, devicetype
 
 
-def update_cli_template(vlan_id,remote_client,file):
+def pi_update_cli_template(vlan_id,remote_client,file):
     """
     This function will update an existing CLI template with the values to be used for deployment
     :param vlan_id: VLAN ID of the remote client
@@ -329,7 +329,7 @@ def pi_deploy_cli_template(device_id, template_name, variable_value):
     return job_name
 
 
-def get_job_status_pi(job_name):
+def pi_get_job_status(job_name):
     """
     Get job status in PI
     Call to Prime Infrastructure - /webacs/api/v1/data/JobSummary, filtered by the job name, will provide the job id
@@ -548,9 +548,9 @@ def main():
     # check for job status
 
     time.sleep(60)  #  time delay to allow PI de deploy the jobs
-    dc_job_status = get_job_status_pi(PI_dc_job_name)
+    dc_job_status = pi_get_job_status(PI_dc_job_name)
     print('DC CLI template deployment status: ', dc_job_status)
-    remote_job_status = get_job_status_pi(PI_remote_job_name)
+    remote_job_status = pi_get_job_status(PI_remote_job_name)
     print('Remote CLI template deployment status: ', remote_job_status)
 
     #  create ASAv outside interface ACL to allow traffic
@@ -604,9 +604,9 @@ def main():
     ]
     PI_remote_job_name = pi_deploy_cli_template(PI_remote_device_id, template_name, variable_value)
     time.sleep(60)  #  time delay to allow PI de deploy the jobs
-    dc_job_status = get_job_status_pi(PI_dc_job_name)
+    dc_job_status = pi_get_job_status(PI_dc_job_name)
     print('DC router restore configurations status: ', dc_job_status)
-    remote_job_status = get_job_status_pi(PI_remote_job_name)
+    remote_job_status = pi_get_job_status(PI_remote_job_name)
     print('Remote router restore configurations status: ', remote_job_status)
 
     # delete ASAv line 1 ACL created to allow traffic
