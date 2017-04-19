@@ -430,6 +430,7 @@ def delete_asav_access_list(acl_id, interface_name):
     url = ASAv_URL + '/api/access/in/' + interface_name + '/rules/'+str(acl_id)
     header = {'content-type': 'application/json', 'accept-type': 'application/json'}
     response = requests.delete(url, headers=header, verify=False, auth=ASAv_AUTH)
+    print("ASA Status Code", response.status_code)
     return response.status_code
 
 
@@ -548,7 +549,7 @@ def main():
 
     # check for job status
 
-    time.sleep(60)  #  time delay to allow PI de deploy the jobs
+    time.sleep(45)  #  time delay to allow PI de deploy the jobs
     dc_job_status = pi_get_job_status(PI_dc_job_name)
     print('DC CLI template deployment status: ', dc_job_status)
     remote_job_status = pi_get_job_status(PI_remote_job_name)
@@ -566,7 +567,7 @@ def main():
 
     # Spark notification
 
-    post_spark_room_message(spark_room_id, 'Requested access to this device: IPD, by user ' + last_person_email + 'has been granted for ' + str(int(timer / 60)) + ' minutes')
+    post_spark_room_message(spark_room_id, 'Requested access to this device: IPD, by user ' + last_person_email + ' has been granted for ' + str(int(timer / 60)) + ' minutes')
 
     # Tropo notification - voice call
 
@@ -604,7 +605,7 @@ def main():
         {'name': 'RemoteClient', 'value': client_IP}, {'name': 'VlanId', 'value': str(vlan_number)}
     ]
     PI_remote_job_name = pi_deploy_cli_template(PI_remote_device_id, template_name, variable_value)
-    time.sleep(60)  #  time delay to allow PI de deploy the jobs
+    time.sleep(45)  #  time delay to allow PI de deploy the jobs
     dc_job_status = pi_get_job_status(PI_dc_job_name)
     print('DC router restore configurations status: ', dc_job_status)
     remote_job_status = pi_get_job_status(PI_remote_job_name)
@@ -614,7 +615,7 @@ def main():
 
     acl_id2 = get_asav_access_list(ASAv_interface)
     delete_status_code = delete_asav_access_list(acl_id2, ASAv_interface)
-    if delete_status_code is None:
+    if delete_status_code is 204:
         print('ASAv access list allowing traffic from ', ASAv_REMOTE_CLIENT, ' to ', client_IP, ' deleted')
     else:
         print('Error deleting the ASAv access list allowing traffic from ', ASAv_REMOTE_CLIENT, ' to ', client_IP)
