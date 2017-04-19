@@ -22,8 +22,8 @@ to dynamically provision secured remote access to Enterprise resources for a thi
 
 CLI Templates to be deployed to the DC and Remote router are included:
 
-GRE_DC_Config - configuration file for the DC CSR1000v
-GRE_DC_Delete - configuration file to restore the initial configuration for the DC CSR1000v
-GRE_Remote_Config - configuration file for the remote Layer 3 Access Switch
-GRE_Remote_Delete - configuration file to restore the initial configuration for the remote Layer 3 Access Switch
+- GRE_DC_Config - configuration file for the DC CSR1000v
+- GRE_DC_Delete - configuration file to restore the initial configuration for the DC CSR1000v
+- GRE_Remote_Config - configuration file for the remote Layer 3 Access Switch
+- GRE_Remote_Delete - configuration file to restore the initial configuration for the remote Layer 3 Access Switch
 
