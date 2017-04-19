@@ -21,6 +21,7 @@ PI_URL = 'https://172.16.11.25'
 PI_USER = 'python'
 PI_PASSW = 'Clive.17'
 PI_AUTH = HTTPBasicAuth(PI_USER, PI_PASSW)
+CLI_DATE_TIME = None
 
 EM_URL = 'https://172.16.11.30/api/v1'
 EM_USER = 'python'
@@ -263,25 +264,6 @@ def get_hostname_id_apic_em(device_id, ticket):
     return hostname, devicetype
 
 
-def pi_update_cli_template(vlan_id,remote_client,file):
-    """
-    This function will update an existing CLI template with the values to be used for deployment
-    :param vlan_id: VLAN ID of the remote client
-    :param remote_client: IP address for the remote client
-    :param file: file that contains the CLI template
-    :return: will save the file with the template to be deployed, with the name: upd_+{file}
-    """
-    file_in = open(file, 'r')
-    file_out = open('upd_'+file, 'w')
-    for line in file_in:
-        line = line.replace('$VlanId',vlan_id)
-        line = line.replace('$RemoteClient',remote_client)
-        file_out.write(line)
-        print(line)
-    file_in.close()
-    file_out.close()
-
-
 def pi_get_device_id(device_name):
     """
     Find out the PI device Id using the device hostname
@@ -298,13 +280,12 @@ def pi_get_device_id(device_name):
     return device_id
 
 
-def pi_deploy_cli_template(device_id, template_name, variable_value):
+def pi_deploy_cli_template(device_id, template_name):
     """
     Deploy a template to a device through Job
     Call to Prime Infrastructure - /webacs/api/v1/op/cliTemplateConfiguration/deployTemplateThroughJob
-    :param device_id: device Prime Infrastructure id
-    :param template_name: PI template name
-    :param variable_value: variables to send to template in JSON format
+    :param device_id: PI device id
+    :param template_name: the name of the template to be deployed
     :return: PI job name
     """
 
@@ -314,7 +295,7 @@ def pi_deploy_cli_template(device_id, template_name, variable_value):
                 'targetDevice': {
                     'targetDeviceID': str(device_id),
                     'variableValues': {
-                        'variableValue': variable_value
+                        'variableValue': ''
                     }
                 }
             },
@@ -356,6 +337,87 @@ def pi_get_job_status(job_name):
     #  print(json.dumps(job_status_json, indent=4, separators=(' , ', ' : ')))
     job_status = job_status_json['queryResponse']['entity'][0]['jobSummaryDTO']['resultStatus']
     return job_status
+
+
+def pi_delete_cli_template(cli_template_name):
+    """
+    This function will delete the PI CLI template with the name {cli_template_name}
+    API call to /webacs/api/v1/op/cliTemplateConfiguration/deleteTemplate
+    :param cli_template_name: the CLI template to be deleted
+    :return: none
+    """
+
+    url = PI_URL + '/webacs/api/v1/op/cliTemplateConfiguration/deleteTemplate?templateName='+cli_template_name
+    header = {'content-type': 'application/json', 'accept': 'application/json'}
+    response = requests.delete(url, headers=header, verify=False, auth=PI_AUTH)
+    if response.status_code == 200:
+        print('PI CLI Template with the name: ', cli_template_name, ' deleted')
+    else:
+        print('PI CLI Template with the name: ', cli_template_name, ' not deleted')
+
+
+def pi_update_cli_template(vlan_id,remote_client,file):
+    """
+    This function will update an existing CLI template with the values to be used for deployment
+    :param vlan_id: VLAN ID of the remote client
+    :param remote_client: IP address for the remote client
+    :param file: file that contains the CLI template
+    :return: will save the DATETIME+{file} file with the template to be deployed
+    """
+    file_in = open(file, 'r')
+    file_out = open(CLI_DATE_TIME+file, 'w')
+    for line in file_in:
+        line = line.replace('$VlanId',vlan_id)
+        line = line.replace('$RemoteClient',remote_client)
+        file_out.write(line)
+        print(line)
+    file_in.close()
+    file_out.close()
+
+
+def pi_clone_cli_template(file):
+    """
+    This function will clone an existing CLI template with the name {file}. The new CLI template name will have
+    the name DATETIME+{file}
+    :param file: file that contains the CLI template
+    :return: will save the DATETIME+{file} file with the template to be deployed
+    """
+    file_in = open(file, 'r')
+    file_out = open(CLI_DATE_TIME+' '+file, 'w')
+    for line in file_in:
+        file_out.write(line)
+    file_in.close()
+    file_out.close()
+    cloned_file_name = CLI_DATE_TIME+' '+file
+    return cloned_file_name
+
+
+def pi_post_cli_template(cli_file_name, cli_template):
+    """
+    This function will upload a new CLI template from the text file {cli_file_name}
+    API call to /webacs/api/v1/op/cliTemplateConfiguration/upload
+    :param cli_file_name: cli template text file
+    :return:
+    """
+    cli_file = open(cli_file_name, 'r')
+    cli_config = cli_file.read()
+    param = {
+        'cliTemplate': {
+            'content': cli_config,
+            'description': '',
+            'deviceType': '',
+            'name': cli_template,
+            'path': '',
+            'tags': '',
+            'variables': ''
+        },
+        'version': ''
+    }
+    pprint(param)
+    url = PI_URL + '/webacs/api/v1/op/cliTemplateConfiguration/upload'
+    header = {'content-type': 'application/json', 'accept': 'application/json'}
+    requests.post(url, json.dumps(param), headers=header, verify=False, auth=PI_AUTH)
+    cli_file.close()
 
 
 def get_asav_access_list(interface_name):
@@ -516,6 +578,16 @@ def main():
 
     EM_TICKET = get_service_ticket_apic_em()
 
+    # the local date and time when the code will start execution
+    # this info will be used for the names of cloned CLI files and PI CLI templates
+
+    global CLI_DATE_TIME
+    DATE_TIME = str(datetime.datetime.now().replace(microsecond=0))
+
+    # replace ":" with "-" from the Date and Time to meet the naming conventions for PI templates
+
+    CLI_DATE_TIME = DATE_TIME.replace(':', '-')
+
     # client IP address - DNS lookup if available
 
     client_IP = '172.16.41.55'
@@ -529,9 +601,24 @@ def main():
     dc_device_hostname = 'PDX-RO'
     PI_dc_device_id = pi_get_device_id(dc_device_hostname)
     print('Head end router: ', dc_device_hostname, ', PI Device id: ', PI_dc_device_id)
-    template_name = 'GREDConfig'
-    variable_value = None    # the template does not require any variables
-    PI_dc_job_name = pi_deploy_cli_template(PI_dc_device_id, template_name, variable_value)
+
+    # this is the CLI text config file
+    dc_file_name = 'GRE_DC_Config.txt'
+    print('DC CLI text file name is: ', dc_file_name)
+
+    # clone the file and rename adding the DATETIME
+    new_dc_file_name = pi_clone_cli_template(dc_file_name)
+    print('Cloned DC CLI text file name is: ', new_dc_file_name)
+
+    cli_template_name = CLI_DATE_TIME+' DC-config'
+    print('DC CLI template name is: ', cli_template_name)
+
+    # upload the new CLI config file to PI
+    pi_post_cli_template(new_dc_file_name, cli_template_name)
+
+    # deploy the new uploaded PI CLI template to the DC router
+
+    PI_dc_job_name = pi_deploy_cli_template(PI_dc_device_id, cli_template_name)
 
     #  deploy remote router CLI template
 
@@ -548,7 +635,7 @@ def main():
 
     # check for job status
 
-    time.sleep(60)  #  time delay to allow PI de deploy the jobs
+    time.sleep(45)  #  time delay to allow PI de deploy the jobs
     dc_job_status = pi_get_job_status(PI_dc_job_name)
     print('DC CLI template deployment status: ', dc_job_status)
     remote_job_status = pi_get_job_status(PI_remote_job_name)
@@ -604,7 +691,7 @@ def main():
         {'name': 'RemoteClient', 'value': client_IP}, {'name': 'VlanId', 'value': str(vlan_number)}
     ]
     PI_remote_job_name = pi_deploy_cli_template(PI_remote_device_id, template_name, variable_value)
-    time.sleep(60)  #  time delay to allow PI de deploy the jobs
+    time.sleep(45)  #  time delay to allow PI de deploy the jobs
     dc_job_status = pi_get_job_status(PI_dc_job_name)
     print('DC router restore configurations status: ', dc_job_status)
     remote_job_status = pi_get_job_status(PI_remote_job_name)
