@@ -280,12 +280,13 @@ def pi_get_device_id(device_name):
     return device_id
 
 
-def pi_deploy_cli_template(device_id, template_name):
+def pi_deploy_cli_template(device_id, template_name, variable_value):
     """
     Deploy a template to a device through Job
     Call to Prime Infrastructure - /webacs/api/v1/op/cliTemplateConfiguration/deployTemplateThroughJob
     :param device_id: PI device id
     :param template_name: the name of the template to be deployed
+    :param variable_value: the values of the variables, if needed
     :return: PI job name
     """
 
@@ -295,7 +296,7 @@ def pi_deploy_cli_template(device_id, template_name):
                 'targetDevice': {
                     'targetDeviceID': str(device_id),
                     'variableValues': {
-                        'variableValue': ''
+                        'variableValue': variable_value
                     }
                 }
             },
@@ -307,7 +308,6 @@ def pi_deploy_cli_template(device_id, template_name):
     response = requests.put(url, data=json.dumps(param), headers=header, verify=False, auth=PI_AUTH)
     job_json = response.json()
     job_name = job_json['mgmtResponse']['cliTemplateCommandJobResult']['jobName']
-    print('job name: ', job_name)
     return job_name
 
 
@@ -353,7 +353,7 @@ def pi_delete_cli_template(cli_template_name):
     if response.status_code == 200:
         print('PI CLI Template with the name: ', cli_template_name, ' deleted')
     else:
-        print('PI CLI Template with the name: ', cli_template_name, ' not deleted')
+        print('PI CLI Template with the name: ', cli_template_name, ' does not exist')
 
 
 def pi_update_cli_template(vlan_id,remote_client,file):
@@ -392,32 +392,62 @@ def pi_clone_cli_template(file):
     return cloned_file_name
 
 
-def pi_post_cli_template(cli_file_name, cli_template):
+def pi_upload_cli_template(cli_file_name, cli_template, list_variables):
     """
-    This function will upload a new CLI template from the text file {cli_file_name}
+    This function will upload a new CLI template from the text file {cli_file_name}.
+    It will check if the PI CLI template exists and if yes, it will delete the CLI template
     API call to /webacs/api/v1/op/cliTemplateConfiguration/upload
+    :param list_variables: variables to be sent to Prime, required by the template
+    :param cli_template: CLI template name
     :param cli_file_name: cli template text file
-    :return:
+    :return: the cli_template_id
     """
+
+    # check if the CLI template exists, if it does, delete the existing template
+
+    cli_template_id = pi_get_cli_template(cli_template)
+    if cli_template_id is not None:
+        pi_delete_cli_template(cli_template)
+        print('Will upload the CLI template: ', cli_template)
+    time.sleep(2)  # required by PI pacing
     cli_file = open(cli_file_name, 'r')
     cli_config = cli_file.read()
     param = {
         'cliTemplate': {
             'content': cli_config,
             'description': '',
-            'deviceType': '',
+            'deviceType': 'Routers,Switches and Hubs',
             'name': cli_template,
             'path': '',
             'tags': '',
-            'variables': ''
+            'variables': list_variables
         },
         'version': ''
     }
-    pprint(param)
     url = PI_URL + '/webacs/api/v1/op/cliTemplateConfiguration/upload'
     header = {'content-type': 'application/json', 'accept': 'application/json'}
     requests.post(url, json.dumps(param), headers=header, verify=False, auth=PI_AUTH)
     cli_file.close()
+    cli_template_id = pi_get_cli_template(cli_template)
+    return cli_template_id
+
+
+def pi_get_cli_template(template):
+    """
+    This function will check if PI has already a CLI template with the name {template}
+    :param template: PI CLI template name
+    :return: {None} if the template does not exist, {template id} if template exists
+    """
+    url = PI_URL + '/webacs/api/v1/data/CliTemplate?name='+template
+    header = {'content-type': 'application/json', 'accept': 'application/json'}
+    templ = requests.get(url, headers=header, verify=False, auth=PI_AUTH)
+    templ_json = templ.json()
+    templ_count = templ_json['queryResponse']['@count']
+    if templ_count == '1':  # if templ_count is "0", template does not exist
+        templ_id = templ_json['queryResponse']['entityId'][0]['$']
+    else:
+        templ_id = None
+    return templ_id
 
 
 def get_asav_access_list(interface_name):
@@ -528,44 +558,43 @@ def main():
     The code will map this IP-enabled device to the IP address {172.16.41.55}
     Access will be provisioned to allow connectivity from DMZ VDI to IPD
     """
-
     # verify if Spark Room exists, if not create Spark Room, and add membership (optional)
-
-    spark_room_id = find_spark_room_id(ROOM_NAME)
-    if spark_room_id is None:
-        spark_room_id = create_spark_room(ROOM_NAME)
-        # add_spark_room_membership(spark_room_id, IT_ENG_EMAIL)
-        print('- ', ROOM_NAME, ' -  Spark room created')
-        post_spark_room_message(spark_room_id, 'To require access enter :  IPD')
-        post_spark_room_message(spark_room_id, 'Ready for input!')
-        print('Instructions posted in the room')
-    else:
-        print('- ', ROOM_NAME, ' -  Existing Spark room found')
-        post_spark_room_message(spark_room_id, 'To require access enter :  IPD')
-        post_spark_room_message(spark_room_id, 'Ready for input!')
-    print('- ', ROOM_NAME, ' -  Spark room id: ', spark_room_id)
-
-    # check for messages to identify the last message posted and the user's email who posted the message
-    # check for the length of time required for access
-
-    last_message = last_spark_room_message(spark_room_id)[0]
-
-    while last_message == 'Ready for input!':
-        time.sleep(5)
-        last_message = last_spark_room_message(spark_room_id)[0]
-        if last_message == 'IPD':
-            last_person_email = last_spark_room_message(spark_room_id)[1]
-            post_spark_room_message(spark_room_id, 'How long time do you need access for? (in minutes)  : ')
-            time.sleep(10)
-            if last_spark_room_message(spark_room_id)[0] == 'How long time do you need access for? (in minutes)  : ':
-                timer = 30 * 60
-            else:
-                timer = int(last_spark_room_message(spark_room_id)[0]) * 60
-        elif last_message != 'Ready for input!':
-            post_spark_room_message(spark_room_id, 'I do not understand you')
+    if input('If skip this section enter y : ') != 'y':
+        spark_room_id = find_spark_room_id(ROOM_NAME)
+        if spark_room_id is None:
+            spark_room_id = create_spark_room(ROOM_NAME)
+            # add_spark_room_membership(spark_room_id, IT_ENG_EMAIL)
+            print('- ', ROOM_NAME, ' -  Spark room created')
             post_spark_room_message(spark_room_id, 'To require access enter :  IPD')
             post_spark_room_message(spark_room_id, 'Ready for input!')
-            last_message = 'Ready for input!'
+            print('Instructions posted in the room')
+        else:
+            print('- ', ROOM_NAME, ' -  Existing Spark room found')
+            post_spark_room_message(spark_room_id, 'To require access enter :  IPD')
+            post_spark_room_message(spark_room_id, 'Ready for input!')
+        print('- ', ROOM_NAME, ' -  Spark room id: ', spark_room_id)
+
+        # check for messages to identify the last message posted and the user's email who posted the message
+        # check for the length of time required for access
+
+        last_message = last_spark_room_message(spark_room_id)[0]
+
+        while last_message == 'Ready for input!':
+            time.sleep(5)
+            last_message = last_spark_room_message(spark_room_id)[0]
+            if last_message == 'IPD':
+                last_person_email = last_spark_room_message(spark_room_id)[1]
+                post_spark_room_message(spark_room_id, 'How long time do you need access for? (in minutes)  : ')
+                time.sleep(10)
+                if last_spark_room_message(spark_room_id)[0] == 'How long time do you need access for? (in minutes)  : ':
+                    timer = 30 * 60
+                else:
+                    timer = int(last_spark_room_message(spark_room_id)[0]) * 60
+            elif last_message != 'Ready for input!':
+                post_spark_room_message(spark_room_id, 'I do not understand you')
+                post_spark_room_message(spark_room_id, 'To require access enter :  IPD')
+                post_spark_room_message(spark_room_id, 'Ready for input!')
+                last_message = 'Ready for input!'
 
     # get UCSD API key
 
@@ -599,46 +628,73 @@ def main():
     #  deploy DC router CLI template
 
     dc_device_hostname = 'PDX-RO'
-    PI_dc_device_id = pi_get_device_id(dc_device_hostname)
-    print('Head end router: ', dc_device_hostname, ', PI Device id: ', PI_dc_device_id)
+    pi_dc_device_id = pi_get_device_id(dc_device_hostname)
+    print('Head end router: ', dc_device_hostname, ', PI Device id: ', pi_dc_device_id)
 
     # this is the CLI text config file
     dc_file_name = 'GRE_DC_Config.txt'
     print('DC CLI text file name is: ', dc_file_name)
 
-    # clone the file and rename adding the DATETIME
-    new_dc_file_name = pi_clone_cli_template(dc_file_name)
-    print('Cloned DC CLI text file name is: ', new_dc_file_name)
+    dc_cli_template_name = dc_file_name.split('.')[0]
+    print('DC CLI template name is: ', dc_cli_template_name)
 
-    cli_template_name = CLI_DATE_TIME+' DC-config'
-    print('DC CLI template name is: ', cli_template_name)
+    variables_list = None
 
     # upload the new CLI config file to PI
-    pi_post_cli_template(new_dc_file_name, cli_template_name)
+    dc_cli_template_id = pi_upload_cli_template(dc_file_name, dc_cli_template_name, variables_list)
+    print('The DC CLI template id is: ', dc_cli_template_id)
 
     # deploy the new uploaded PI CLI template to the DC router
 
-    PI_dc_job_name = pi_deploy_cli_template(PI_dc_device_id, cli_template_name)
+    variables_value = None
+    pi_dc_job_name = pi_deploy_cli_template(pi_dc_device_id, dc_cli_template_name, variables_value)
+    print('The PI DC Job CLI template deployment is: ', pi_dc_job_name)
 
     #  deploy remote router CLI template
 
     remote_device_hostname = client_connected[0]
     vlan_number = client_connected[2]
+
     print('Client connected to switch: ', remote_device_hostname, ' VLAN: ', vlan_number)
-    PI_remote_device_id = pi_get_device_id(remote_device_hostname)
-    print('Remote Router: ', remote_device_hostname, ', PI device Id: ', PI_remote_device_id)
-    template_name = 'GRERConfig'
-    variable_value = [
+    pi_remote_device_id = pi_get_device_id(remote_device_hostname)
+
+    print('Remote Router: ', remote_device_hostname, ', PI device Id: ', pi_remote_device_id)
+    remote_file_name = 'GRE_Remote_Config.txt'
+    print('Remote CLI text file name is: ', remote_file_name)
+
+    remote_cli_template_name = remote_file_name.split('.')[0]
+    print('Remote CLI template name is: ', remote_cli_template_name)
+
+    variables_list = {
+        'variable': [
+            {'name': 'RemoteClient', 'displayLabel': 'RemoteClient', 'description': 'IP address', 'required': 'True', 'type': 'IPv4 Address'},
+            {'name': 'VlanId', 'displayLabel': 'VlanId', 'description': 'VLAN number', 'required': 'True', 'type': 'Integer'}
+        ]
+    }
+    print('The variables used for this template are: ')
+    pprint(variables_list)
+
+    # upload the new CLI config file to PI
+    remote_cli_template_id = pi_upload_cli_template(remote_file_name, remote_cli_template_name, variables_list)
+    print('The Remote CLI template id is: ', remote_cli_template_id)
+
+    variables_value = [
         {'name': 'RemoteClient', 'value': client_IP}, {'name': 'VlanId', 'value': str(vlan_number)}
     ]
-    PI_remote_job_name = pi_deploy_cli_template(PI_remote_device_id, template_name, variable_value)
+    print('Variables values used to deploy the remote router template are: ')
+    pprint(variables_value)
+
+    pi_remote_job_name = pi_deploy_cli_template(pi_remote_device_id, remote_cli_template_name, variables_value)
+    print('The PI Remote Job CLI template deployment is: ', pi_remote_job_name)
 
     # check for job status
 
+    print('Wait for PI to complete template deployments')
     time.sleep(45)  #  time delay to allow PI de deploy the jobs
-    dc_job_status = pi_get_job_status(PI_dc_job_name)
+    dc_job_status = pi_get_job_status(pi_dc_job_name)
     print('DC CLI template deployment status: ', dc_job_status)
-    remote_job_status = pi_get_job_status(PI_remote_job_name)
+    time.sleep(2)
+    remote_job_status = pi_get_job_status(pi_remote_job_name)
     print('Remote CLI template deployment status: ', remote_job_status)
 
     #  create ASAv outside interface ACL to allow traffic
@@ -653,49 +709,79 @@ def main():
 
     # Spark notification
 
-    post_spark_room_message(spark_room_id, 'Requested access to this device: IPD, by user ' + last_person_email + ' has been granted for ' + str(int(timer / 60)) + ' minutes')
+    # post_spark_room_message(spark_room_id, 'Requested access to this device: IPD, by user ' + last_person_email + ' has been granted for ' + str(int(timer / 60)) + ' minutes')
 
     # Tropo notification - voice call
 
-    voice_notification_result = tropo_notification()
-    post_spark_room_message(spark_room_id, 'Tropo Voice Notification: ' + voice_notification_result)
+    # voice_notification_result = tropo_notification()
+    # post_spark_room_message(spark_room_id, 'Tropo Voice Notification: ' + voice_notification_result)
 
     #
     # timer required to maintain the ERNA enabled, user provided
     #
 
-    time.sleep(timer)
-
+    # time.sleep(timer)
+    input('Any key to continue')
     #
     #  restore configurations to initial state
     #
 
     #  restore DC router config
 
-    dc_device_hostname = 'PDX-RO'
-    PI_dc_device_id = pi_get_device_id(dc_device_hostname)
-    print('Head end router: ', dc_device_hostname, ', PI Device id: ', PI_dc_device_id)
-    template_name = 'GREDDelete'
-    variable_value = None  #  the template does not require any variables
-    PI_dc_job_name = pi_deploy_cli_template(PI_dc_device_id, template_name, variable_value)
+    print('\nStart to restore initial configurations\n')
+    dc_del_file_name = 'GRE_DC_Delete.txt'
+    print('DC Delete CLI text file name is: ', dc_del_file_name)
+
+    dc_del_cli_template_name = dc_del_file_name.split('.')[0]
+    print('DC Delete CLI template name is: ', dc_del_cli_template_name)
+
+    variables_list = None
+
+    # upload the new CLI config file to PI
+    dc_del_cli_template_id = pi_upload_cli_template(dc_del_file_name, dc_del_cli_template_name, variables_list)
+    print('The DC CLI template id is: ', dc_del_cli_template_id)
+
+    # deploy the new uploaded PI CLI template to the DC router
+
+    variables_value = None
+    pi_dc_del_job_name = pi_deploy_cli_template(pi_dc_device_id, dc_del_cli_template_name, variables_value)
+    print('The PI DC Job CLI template deployment is: ', pi_dc_del_job_name)
 
     #  restore remote router CLI template
 
-    remote_device_hostname = client_connected[0]
-    vlan_number = client_connected[2]
-    print('Client connected to switch: ', remote_device_hostname, ' VLAN: ', vlan_number)
-    PI_remote_device_id = pi_get_device_id(remote_device_hostname)
-    print('Remote Router: ', remote_device_hostname, ', PI device Id: ', PI_remote_device_id)
-    template_name = 'GRERDelete'
-    variable_value = [
+    remote_del_file_name = 'GRE_Remote_Delete.txt'
+    print('Remote CLI text file name is: ', remote_del_file_name)
+
+    remote_del_cli_template_name = remote_del_file_name.split('.')[0]
+    print('Remote CLI template name is: ', remote_del_cli_template_name)
+
+    # upload the new CLI config file to PI
+
+    variables_list = {
+        'variable': [
+            {'name': 'RemoteClient', 'displayLabel': 'RemoteClient', 'description': 'IP address', 'required': 'True', 'type': 'IPv4 Address'},
+            {'name': 'VlanId', 'displayLabel': 'VlanId', 'description': 'VLAN number', 'required': 'True', 'type': 'Integer'}
+        ]
+    }
+
+    remote_del_cli_template_id = pi_upload_cli_template(remote_del_file_name, remote_del_cli_template_name, variables_list)
+    print('The Remote CLI template id is: ', remote_del_cli_template_id)
+
+    variables_value = [
         {'name': 'RemoteClient', 'value': client_IP}, {'name': 'VlanId', 'value': str(vlan_number)}
     ]
-    PI_remote_job_name = pi_deploy_cli_template(PI_remote_device_id, template_name, variable_value)
+
+    pi_remote_del_job_name = pi_deploy_cli_template(pi_remote_device_id, remote_del_cli_template_name, variables_value)
+    print('The PI Remote Job CLI template deployment is: ', pi_remote_del_job_name)
+
+    # check for job status
+
+    print('Wait for PI to complete template deployments')
     time.sleep(45)  #  time delay to allow PI de deploy the jobs
-    dc_job_status = pi_get_job_status(PI_dc_job_name)
-    print('DC router restore configurations status: ', dc_job_status)
-    remote_job_status = pi_get_job_status(PI_remote_job_name)
-    print('Remote router restore configurations status: ', remote_job_status)
+    dc_del_job_status = pi_get_job_status(pi_dc_del_job_name)
+    print('DC router restore configurations status: ', dc_del_job_status)
+    remote_del_job_status = pi_get_job_status(pi_remote_del_job_name)
+    print('Remote router restore configurations status: ', remote_del_job_status)
 
     # delete ASAv line 1 ACL created to allow traffic
 
