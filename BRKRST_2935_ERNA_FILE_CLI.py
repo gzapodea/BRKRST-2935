@@ -280,6 +280,39 @@ def pi_get_device_id(device_name):
     return device_id
 
 
+def get_device_id_apic_em(device_name, ticket):
+    """
+    This function will find the APIC-EM device id for the device with the name {device_name}
+    :param device_name: device hostname
+    :return: APIC-EM device id
+    """
+
+    url = EM_URL + '/network-device/'
+    header = {'accept': 'application/json', 'X-Auth-Token': ticket}
+    device_response = requests.get(url, headers=header, verify=False)
+    device_json = device_response.json()
+    device_list = device_json['response']
+    for device in device_list:
+        if device['hostname'] == device_name:
+            device_id = device['id']
+    return device_id
+
+
+def sync_device_apic_em(device_name, ticket):
+    """
+    This function will sync the device configuration from the device with the name {device_name}
+    :param device_name: device hostname
+    :return: 
+    """
+
+    device_id = get_device_id_apic_em(device_name, ticket)
+    param = [device_id]
+    url = EM_URL + '/network-device/sync'
+    header = {'accept': 'application/json', 'content-type': 'application/json', 'X-Auth-Token': ticket}
+    sync_response = requests.put(url, data=json.dumps(param), headers=header, verify=False)
+    return sync_response.status_code
+
+
 def pi_deploy_cli_template(device_id, template_name, variable_value):
     """
     Deploy a template to a device through Job
@@ -707,6 +740,17 @@ def main():
     else:
         print('Error creating the ASAv access list to allow traffic from ', ASAv_REMOTE_CLIENT, ' to ', client_IP)
 
+    # validation of topology, start with sync the two devices DC and Remote SW
+    # path visualization
+
+    dc_sync = sync_device_apic_em(dc_device_hostname, EM_TICKET)
+    remote_sync = sync_device_apic_em(remote_device_hostname, EM_TICKET)
+    if dc_sync == 202:
+        print('APIC-EM sync the DC router')
+    if remote_sync == 202:
+        print('APIC-EM sync the remote router')
+
+
     # Spark notification
 
     # post_spark_room_message(spark_room_id, 'Requested access to this device: IPD, by user ' + last_person_email + ' has been granted for ' + str(int(timer / 60)) + ' minutes')
@@ -721,6 +765,9 @@ def main():
     #
 
     # time.sleep(timer)
+
+
+
     input('Any key to continue')
     #
     #  restore configurations to initial state
