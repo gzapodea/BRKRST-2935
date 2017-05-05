@@ -8,6 +8,7 @@ import json
 import time
 import datetime
 import requests.packages.urllib3
+
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from requests.auth import HTTPBasicAuth  # for Basic Auth
 
@@ -525,7 +526,9 @@ def main():
 
     client_connected = locate_client_apic_em(client_IP, EM_TICKET)
 
+    #
     #  deploy DC router CLI template
+    #
 
     dc_device_hostname = 'PDX-RO'
     PI_dc_device_id = pi_get_device_id(dc_device_hostname)
@@ -534,7 +537,9 @@ def main():
     variable_value = None    # the template does not require any variables
     PI_dc_job_name = pi_deploy_cli_template(PI_dc_device_id, template_name, variable_value)
 
+    #
     #  deploy remote router CLI template
+    #
 
     remote_device_hostname = client_connected[0]
     vlan_number = client_connected[2]
@@ -623,6 +628,5 @@ def main():
 
 if __name__ == '__main__':
     main()
-
 
 

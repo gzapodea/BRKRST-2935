@@ -217,11 +217,11 @@ def get_service_ticket_apic_em():
         return ticket
 
 
-def locate_client_apic_em(client_IP, ticket):
+def locate_client_apic_em(client_ip, ticket):
     """
     Locate a wired client device in the infrastructure by using the client IP address
     Call to APIC-EM - /host
-    :param client_IP: Client IP Address
+    :param client_ip: Client IP Address
     :param ticket: APIC-EM ticket
     :return: hostname, interface_name, vlan_Id
     """
@@ -231,18 +231,18 @@ def locate_client_apic_em(client_IP, ticket):
     vlan_Id = None
     url = EM_URL + '/host'
     header = {'accept': 'application/json', 'X-Auth-Token': ticket}
-    payload = {'hostIp': client_IP}
+    payload = {'hostIp': client_ip}
     host_response = requests.get(url, params=payload, headers=header, verify=False)
     host_json = host_response.json()
     if not host_json['response']:
-        print('The IP address ', client_IP, ' is not used by any client devices')
+        print('The IP address ', client_ip, ' is not used by any client devices')
     else:
         host_info = host_json['response'][0]
         interface_name = host_info['connectedInterfaceName']
         device_id = host_info['connectedNetworkDeviceId']
         vlan_Id = host_info['vlanId']
         hostname = get_hostname_id_apic_em(device_id, ticket)[0]
-        print('The IP address ', client_IP, ' is connected to the network device ', hostname, ',  interface ', interface_name)
+        print('The IP address ', client_ip, ' is connected to the network device ', hostname, ',  interface ', interface_name)
     return hostname, interface_name, vlan_Id
 
 
@@ -284,6 +284,7 @@ def get_device_id_apic_em(device_name, ticket):
     """
     This function will find the APIC-EM device id for the device with the name {device_name}
     :param device_name: device hostname
+    :param ticket: APIC-EM ticket
     :return: APIC-EM device id
     """
 
@@ -302,7 +303,8 @@ def sync_device_apic_em(device_name, ticket):
     """
     This function will sync the device configuration from the device with the name {device_name}
     :param device_name: device hostname
-    :return: 
+    :param ticket: APIC-EM ticket
+    :return: the response, 202 if sync initiated
     """
 
     device_id = get_device_id_apic_em(device_name, ticket)
@@ -311,6 +313,65 @@ def sync_device_apic_em(device_name, ticket):
     header = {'accept': 'application/json', 'content-type': 'application/json', 'X-Auth-Token': ticket}
     sync_response = requests.put(url, data=json.dumps(param), headers=header, verify=False)
     return sync_response.status_code
+
+
+def create_path_visualisation_apic_em(src_ip, dest_ip, ticket):
+    """
+    This function will create a new Path Visualisation between the source IP address {src_ip} and the
+    destination IP address {dest_ip}
+    :param src_ip: Source IP address
+    :param dest_ip: Destination IP address
+    :param ticket: APIC-EM ticket
+    :return: APIC-EM path visualisation id
+    """
+
+    param = {
+        'destIP': dest_ip,
+        'periodicRefresh': False,
+        'sourceIP': src_ip
+    }
+
+    url = EM_URL + '/flow-analysis'
+    header = {'accept': 'application/json', 'content-type': 'application/json', 'X-Auth-Token': ticket}
+    path_response = requests.post(url, data=json.dumps(param), headers=header, verify=False)
+    path_json = path_response.json()
+    path_id = path_json['response']['flowAnalysisId']
+    return path_id
+
+
+def get_path_visualisation_info(path_id, ticket):
+    """
+    This function will return the path visualisation details for the APIC-EM path visualisation {id}
+    :param path_id: APIC-EM path visualisation id
+    :param ticket: APIC-EM ticket
+    :return: Path visualisation details in a list [device,interface_out,interface_in,device...]
+    """
+
+    url = EM_URL + '/flow-analysis/' + path_id
+    header = {'accept': 'application/json', 'content-type': 'application/json', 'X-Auth-Token': ticket}
+    path_response = requests.get(url, headers=header, verify=False)
+    path_json = path_response.json()
+    path_info = path_json['response']
+    path_status = path_info['request']['status']
+    path_list = []
+    if path_status == 'COMPLETED':
+        network_info = path_info['networkElementsInfo']
+        path_list.append(path_info['request']['sourceIP'])
+        for elem in network_info:
+            try:
+                path_list.append(elem['ingressInterface']['physicalInterface']['name'])
+            except:
+                pass
+            try:
+                path_list.append(elem['name'])
+            except:
+                pass
+            try:
+                path_list.append(elem['egressInterface']['physicalInterface']['name'])
+            except:
+                pass
+        path_list.append(path_info['request']['destIP'])
+    return path_status, path_list
 
 
 def pi_deploy_cli_template(device_id, template_name, variable_value):
@@ -500,13 +561,13 @@ def get_asav_access_list(interface_name):
     return acl_id_number
 
 
-def create_asav_access_list(acl_id, interface_name, client_IP):
+def create_asav_access_list(acl_id, interface_name, client_ip):
     """
     Insert in line 1 a new ACL entry to existing interface ACL
     Call to ASAv - /api/access/in/{interfaceId}/rules, post method
     :param acl_id: ASA ACL id number
     :param interface_name: ASA interface_name
-    :param client_IP: client IP
+    :param client_ip: client IP
     :return: Response Code - 201 if successful
     """
 
@@ -520,7 +581,7 @@ def create_asav_access_list(acl_id, interface_name, client_IP):
         },
         'destinationAddress': {
             'kind': 'IPv4Address',
-            'value': client_IP
+            'value': client_ip
         },
         'sourceService': {
             'kind': 'NetworkProtocol',
@@ -640,6 +701,13 @@ def main():
 
     EM_TICKET = get_service_ticket_apic_em()
 
+
+
+    #=======
+
+
+    #=======
+
     # the local date and time when the code will start execution
     # this info will be used for the names of cloned CLI files and PI CLI templates
 
@@ -652,11 +720,11 @@ def main():
 
     # client IP address - DNS lookup if available
 
-    client_IP = '172.16.41.55'
+    client_ip = '172.16.41.55'
 
     # locate IPD in the environment using APIC-EM
 
-    client_connected = locate_client_apic_em(client_IP, EM_TICKET)
+    client_connected = locate_client_apic_em(client_ip, EM_TICKET)
 
     #  deploy DC router CLI template
 
@@ -712,7 +780,7 @@ def main():
     print('The Remote CLI template id is: ', remote_cli_template_id)
 
     variables_value = [
-        {'name': 'RemoteClient', 'value': client_IP}, {'name': 'VlanId', 'value': str(vlan_number)}
+        {'name': 'RemoteClient', 'value': client_ip}, {'name': 'VlanId', 'value': str(vlan_number)}
     ]
     print('Variables values used to deploy the remote router template are: ')
     pprint(variables_value)
@@ -734,11 +802,11 @@ def main():
 
     ASAv_interface = 'outside'
     acl_id = get_asav_access_list(ASAv_interface)
-    create_status_code = create_asav_access_list(acl_id, ASAv_interface, client_IP)
+    create_status_code = create_asav_access_list(acl_id, ASAv_interface, client_ip)
     if create_status_code == 201:
-        print('ASAv access list created to allow traffic from ', ASAv_REMOTE_CLIENT, ' to ', client_IP)
+        print('ASAv access list created to allow traffic from ', ASAv_REMOTE_CLIENT, ' to ', client_ip)
     else:
-        print('Error creating the ASAv access list to allow traffic from ', ASAv_REMOTE_CLIENT, ' to ', client_IP)
+        print('Error creating the ASAv access list to allow traffic from ', ASAv_REMOTE_CLIENT, ' to ', client_ip)
 
     # validation of topology, start with sync the two devices DC and Remote SW
     # path visualization
@@ -749,7 +817,22 @@ def main():
         print('APIC-EM sync the DC router')
     if remote_sync == 202:
         print('APIC-EM sync the remote router')
+    print('Waiting for devices to sync their configuration with APIC-EM')
+    time.sleep(120)
 
+    # check Path visualization
+
+    path_visualisation_id = create_path_visualisation_apic_em('172.16.202.1', client_ip, EM_TICKET)
+    print('The APIC-EM Path Visualisation started, id: ', path_visualisation_id)
+
+    print('Wait for Path Visualization to complete')
+    time.sleep(10)
+
+    path_visualisation_status = get_path_visualisation_info(path_visualisation_id, EM_TICKET)[0]
+    print('Path visualisation status: ', path_visualisation_status)
+    path_visualisation_info = get_path_visualisation_info(path_visualisation_id, EM_TICKET)[1]
+    print('Path visualisation details: ')
+    pprint(path_visualisation_info)
 
     # Spark notification
 
@@ -815,7 +898,7 @@ def main():
     print('The Remote CLI template id is: ', remote_del_cli_template_id)
 
     variables_value = [
-        {'name': 'RemoteClient', 'value': client_IP}, {'name': 'VlanId', 'value': str(vlan_number)}
+        {'name': 'RemoteClient', 'value': client_ip}, {'name': 'VlanId', 'value': str(vlan_number)}
     ]
 
     pi_remote_del_job_name = pi_deploy_cli_template(pi_remote_device_id, remote_del_cli_template_name, variables_value)
@@ -835,9 +918,9 @@ def main():
     acl_id2 = get_asav_access_list(ASAv_interface)
     delete_status_code = delete_asav_access_list(acl_id2, ASAv_interface)
     if delete_status_code is 204:
-        print('ASAv access list allowing traffic from ', ASAv_REMOTE_CLIENT, ' to ', client_IP, ' deleted')
+        print('ASAv access list allowing traffic from ', ASAv_REMOTE_CLIENT, ' to ', client_ip, ' deleted')
     else:
-        print('Error deleting the ASAv access list allowing traffic from ', ASAv_REMOTE_CLIENT, ' to ', client_IP)
+        print('Error deleting the ASAv access list allowing traffic from ', ASAv_REMOTE_CLIENT, ' to ', client_ip)
 
 
 if __name__ == '__main__':
