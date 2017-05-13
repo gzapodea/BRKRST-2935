@@ -8,6 +8,10 @@ import json
 import time
 import datetime
 import requests.packages.urllib3
+import logging
+import sys
+import select
+
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from requests.auth import HTTPBasicAuth  # for Basic Auth
 
@@ -59,6 +63,46 @@ def pprint(json_data):
     """
 
     print(json.dumps(json_data, indent=4, separators=(' , ', ' : ')))
+
+
+def get_input_ip():
+    """
+    This function will ask the user to input the IP address. The format of the IP address is not validated
+    The function will return the IP address
+    :return: the IP address
+    """
+
+    ip_address = input('Input the IP address to be validated, (or q to exit) ?  ')
+    return ip_address
+
+
+def get_input_mac():
+    """
+    This function will ask the user to input the IP address. The format of the IP address is not validated
+    The function will return the IP address
+    :return: the IP address
+    """
+
+    mac_address = input('Input the MAC address to be validated, (or q to exit) ?  ')
+    return mac_address
+
+
+def get_input_timeout(message, wait_time):
+    """
+    This function will ask the user to input the value requested in the {message}, in the time specified {time}
+    :param message: message to provide the user information on what is required
+    :param wait_time: time limit for the user input
+    :return: user input as string
+    """
+
+    print(message + ' in ' + str(wait_time) + ' seconds')
+    i, o, e = select.select([sys.stdin], [], [], wait_time)
+
+    if i:
+        input_value = sys.stdin.readline().strip()
+    else:
+        input_value = None
+    return input_value
 
 
 def create_spark_room(room_name):
@@ -652,8 +696,37 @@ def main():
     The code will map this IP-enabled device to the IP address {172.16.41.55}
     Access will be provisioned to allow connectivity from DMZ VDI to IPD
     """
+
+    # save the initial stdout
+    initial_sys = sys.stdout
+
+    user_input = get_input_timeout('If running in Demo Mode please enter y ', 10)
+
+    if user_input != 'y':
+
+        # open a log file 'erna.log'
+        file_log = open('erna_log.log', 'w')
+
+        # open an error log file 'erna_err.log'
+        err_log = open('erna_err.log', 'w')
+
+        # redirect the stdout to file_log and err_log
+        sys.stdout = file_log
+        sys.stderr = err_log
+
+        # configure basic logging to send to stdout, level DEBUG, include timestamps
+        logging.basicConfig(level=logging.DEBUG, stream=sys.stdout, format=('%(asctime)s - %(levelname)s - %(message)s'))
+
+    # the local date and time when the code will start execution
+    # this info will be used for the names of cloned CLI files and PI CLI templates
+
+    DATE_TIME = str(datetime.datetime.now().replace(microsecond=0))
+    print('The app started running at this time '+DATE_TIME)
+
     # verify if Spark Room exists, if not create Spark Room, and add membership (optional)
-    if input('If skip this section enter y : ') != 'y':
+    user_input = 'y'
+    user_input = get_input_timeout('If do not skip this section enter n : ', 10)
+    if user_input != 'y':
         spark_room_id = find_spark_room_id(ROOM_NAME)
         if spark_room_id is None:
             spark_room_id = create_spark_room(ROOM_NAME)
@@ -701,22 +774,6 @@ def main():
 
     EM_TICKET = get_service_ticket_apic_em()
 
-
-
-    #=======
-
-
-    #=======
-
-    # the local date and time when the code will start execution
-    # this info will be used for the names of cloned CLI files and PI CLI templates
-
-    global CLI_DATE_TIME
-    DATE_TIME = str(datetime.datetime.now().replace(microsecond=0))
-
-    # replace ":" with "-" from the Date and Time to meet the naming conventions for PI templates
-
-    CLI_DATE_TIME = DATE_TIME.replace(':', '-')
 
     # client IP address - DNS lookup if available
 
@@ -818,7 +875,7 @@ def main():
     if remote_sync == 202:
         print('APIC-EM sync the remote router')
     print('Waiting for devices to sync their configuration with APIC-EM')
-    time.sleep(120)
+    time.sleep(180)
 
     # check Path visualization
 
@@ -851,7 +908,7 @@ def main():
 
 
 
-    input('Any key to continue')
+    get_input_timeout('Any key to continue ', 60)
     #
     #  restore configurations to initial state
     #
@@ -922,6 +979,10 @@ def main():
     else:
         print('Error deleting the ASAv access list allowing traffic from ', ASAv_REMOTE_CLIENT, ' to ', client_ip)
 
+    # restore the stdout to initial value
+    sys.stdout = initial_sys
+
+    print('End of application run')
 
 if __name__ == '__main__':
     main()
