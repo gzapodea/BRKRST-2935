@@ -100,8 +100,10 @@ def get_input_timeout(message, wait_time):
 
     if i:
         input_value = sys.stdin.readline().strip()
+        print('User input: ', i)
     else:
         input_value = None
+        print('No user input in ', wait_time)
     return input_value
 
 

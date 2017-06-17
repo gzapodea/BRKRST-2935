@@ -1,2 +1,4 @@
 /.idea/
 /ERNA_init.py
+__pycache__/
+
