@@ -310,22 +310,6 @@ def get_hostname_id_apic_em(device_id, ticket):
     return hostname, devicetype
 
 
-def pi_get_device_id(device_name):
-    """
-    Find out the PI device Id using the device hostname
-    Call to Prime Infrastructure - /webacs/api/v1/data/Devices, filtered using the Device Hostname
-    :param device_name: device hostname
-    :return: PI device Id
-    """
-
-    url = PI_URL + '/webacs/api/v1/data/Devices?deviceName=' + device_name
-    header = {'content-type': 'application/json', 'accept': 'application/json'}
-    response = requests.get(url, headers=header, verify=False, auth=PI_AUTH)
-    device_id_json = response.json()
-    device_id = device_id_json['queryResponse']['entityId'][0]['$']
-    return device_id
-
-
 def get_device_id_apic_em(device_name, ticket):
     """
     This function will find the APIC-EM device id for the device with the name {device_name}
@@ -418,6 +402,22 @@ def get_path_visualisation_info(path_id, ticket):
                 pass
         path_list.append(path_info['request']['destIP'])
     return path_status, path_list
+
+
+def pi_get_device_id(device_name):
+    """
+    Find out the PI device Id using the device hostname
+    Call to Prime Infrastructure - /webacs/api/v1/data/Devices, filtered using the Device Hostname
+    :param device_name: device hostname
+    :return: PI device Id
+    """
+
+    url = PI_URL + '/webacs/api/v1/data/Devices?deviceName=' + device_name
+    header = {'content-type': 'application/json', 'accept': 'application/json'}
+    response = requests.get(url, headers=header, verify=False, auth=PI_AUTH)
+    device_id_json = response.json()
+    device_id = device_id_json['queryResponse']['entityId'][0]['$']
+    return device_id
 
 
 def pi_deploy_cli_template(device_id, template_name, variable_value):
@@ -767,10 +767,10 @@ def main():
 
     # get UCSD API key
 
-    # ucs_key = get_ucsd_api_key()
+    # ucsd_key = get_ucsd_api_key()
 
     # execute UCSD workflow to connect VDI to VLAN, power on VDI
-    # execute_ucsd_workflow(ucs_key, UCSD_CONNECT_FLOW)
+    # execute_ucsd_workflow(ucsd_key, UCSD_CONNECT_FLOW)
 
     # get the APIC-EM auth ticket
 
@@ -877,7 +877,7 @@ def main():
     if remote_sync == 202:
         print('APIC-EM sync the remote router')
     print('Waiting for devices to sync their configuration with APIC-EM')
-    time.sleep(180)
+    time.sleep(240)
 
     # check Path visualization
 
@@ -895,22 +895,21 @@ def main():
 
     # Spark notification
 
-    # post_spark_room_message(spark_room_id, 'Requested access to this device: IPD, by user ' + last_person_email + ' has been granted for ' + str(int(timer / 60)) + ' minutes')
+    post_spark_room_message(spark_room_id, 'Requested access to this device: IPD, by user ' + last_person_email + ' has been granted for ' + str(int(timer / 60)) + ' minutes')
 
     # Tropo notification - voice call
 
-    # voice_notification_result = tropo_notification()
-    # post_spark_room_message(spark_room_id, 'Tropo Voice Notification: ' + voice_notification_result)
+    voice_notification_result = tropo_notification()
+    post_spark_room_message(spark_room_id, 'Tropo Voice Notification: ' + voice_notification_result)
 
     #
     # timer required to maintain the ERNA enabled, user provided
     #
 
     # time.sleep(timer)
+    input('Input any key to continue !')
 
 
-
-    get_input_timeout('Any key to continue ', 60)
     #
     #  restore configurations to initial state
     #
