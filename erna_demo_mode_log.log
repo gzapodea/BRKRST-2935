@@ -1,0 +1,114 @@
+/Users/gzapodea/P36VEnv/bin/python /Users/gzapodea/PythonCode/BRKRST_2935/BRKRST_2935_ERNA_FILE_CLI.py
+If running in Demo Mode please enter y  in 10 seconds
+y
+The app started running at this time 2017-05-13 14:17:13
+If do not skip this section enter n :  in 10 seconds
+n
+<Response [200]>
+-  ERNA  -  Existing Spark room found
+Message posted :   To require access enter :  IPD
+Message posted :   Ready for input!
+-  ERNA  -  Spark room id:  Y2lzY29zcGFyazovL3VzL1JPT00vYzQ4OWNkNzAtZjQ4Mi0xMWU2LWI4OTItNGIwMTczN2UxZDIz
+Last room message :   Ready for input!
+Last Person Email gzapodea@cisco.com
+Last room message :   Ready for input!
+Last Person Email gzapodea@cisco.com
+Last room message :   IPD
+Last Person Email gzapodea@cisco.com
+Last room message :   IPD
+Last Person Email gzapodea@cisco.com
+Message posted :   How long time do you need access for? (in minutes)  : 
+Last room message :   3
+Last Person Email gzapodea@cisco.com
+Last room message :   3
+Last Person Email gzapodea@cisco.com
+APIC-EM ticket:  ST-372-wfO4t6t2pTHatrYDwFuA-cas
+The IP address  172.16.41.55  is connected to the network device  NYC-SW ,  interface  GigabitEthernet1/0/13
+Head end router:  PDX-RO , PI Device id:  585593
+DC CLI text file name is:  GRE_DC_Config.txt
+DC CLI template name is:  GRE_DC_Config
+PI CLI Template with the name:  GRE_DC_Config  deleted
+Will upload the CLI template:  GRE_DC_Config
+The DC CLI template id is:  21267426
+The PI DC Job CLI template deployment is:  JobCliTemplateDeployIOSDevices02_17_56_299_PM_05_13_2017
+Client connected to switch:  NYC-SW  VLAN:  41
+Remote Router:  NYC-SW , PI device Id:  585590
+Remote CLI text file name is:  GRE_Remote_Config.txt
+Remote CLI template name is:  GRE_Remote_Config
+The variables used for this template are: 
+{
+    "variable" : [
+        {
+            "name" : "RemoteClient" , 
+            "displayLabel" : "RemoteClient" , 
+            "description" : "IP address" , 
+            "required" : "True" , 
+            "type" : "IPv4 Address"
+        } , 
+        {
+            "name" : "VlanId" , 
+            "displayLabel" : "VlanId" , 
+            "description" : "VLAN number" , 
+            "required" : "True" , 
+            "type" : "Integer"
+        }
+    ]
+}
+PI CLI Template with the name:  GRE_Remote_Config  deleted
+Will upload the CLI template:  GRE_Remote_Config
+The Remote CLI template id is:  21267427
+Variables values used to deploy the remote router template are: 
+[
+    {
+        "name" : "RemoteClient" , 
+        "value" : "172.16.41.55"
+    } , 
+    {
+        "name" : "VlanId" , 
+        "value" : "41"
+    }
+]
+The PI Remote Job CLI template deployment is:  JobCliTemplateDeployIOSDevices02_18_01_534_PM_05_13_2017
+Wait for PI to complete template deployments
+DC CLI template deployment status:  SUCCESS
+Remote CLI template deployment status:  SUCCESS
+ASAv access list created to allow traffic from  172.16.203.50  to  172.16.41.55
+APIC-EM sync the DC router
+APIC-EM sync the remote router
+Waiting for devices to sync their configuration with APIC-EM
+The APIC-EM Path Visualisation started, id:  c9cc14db-b036-49ec-a714-382a99288494
+Wait for Path Visualization to complete
+Path visualisation status:  COMPLETED
+Path visualisation details: 
+[
+    "172.16.202.1" , 
+    "PDX-RO" , 
+    "Tunnel201" , 
+    "Tunnel201" , 
+    "NYC-SW" , 
+    "GigabitEthernet1/0/13" , 
+    "172.16.41.55"
+]
+Any key to continue  in 60 seconds
+
+Start to restore initial configurations
+
+DC Delete CLI text file name is:  GRE_DC_Delete.txt
+DC Delete CLI template name is:  GRE_DC_Delete
+PI CLI Template with the name:  GRE_DC_Delete  deleted
+Will upload the CLI template:  GRE_DC_Delete
+The DC CLI template id is:  21267428
+The PI DC Job CLI template deployment is:  JobCliTemplateDeployIOSDevices02_23_05_350_PM_05_13_2017
+Remote CLI text file name is:  GRE_Remote_Delete.txt
+Remote CLI template name is:  GRE_Remote_Delete
+PI CLI Template with the name:  GRE_Remote_Delete  deleted
+Will upload the CLI template:  GRE_Remote_Delete
+The Remote CLI template id is:  21267429
+The PI Remote Job CLI template deployment is:  JobCliTemplateDeployIOSDevices02_23_09_533_PM_05_13_2017
+Wait for PI to complete template deployments
+DC router restore configurations status:  SUCCESS
+Remote router restore configurations status:  SUCCESS
+ASAv access list allowing traffic from  172.16.203.50  to  172.16.41.55  deleted
+End of application run
+
+Process finished with exit code 0

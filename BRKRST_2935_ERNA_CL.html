@@ -1,0 +1,213 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module BRKRST_2935_ERNA_CL</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>BRKRST_2935_ERNA_CL</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/gzapodea/PythonCode/BRKRST_2935/BRKRST_2935_ERNA_CL.py">/Users/gzapodea/PythonCode/BRKRST_2935/BRKRST_2935_ERNA_CL.py</a></font></td></tr></table>
+    <p><tt>#&nbsp;developed&nbsp;by&nbsp;Gabi&nbsp;Zapodeanu,&nbsp;TSA,&nbsp;GSS,&nbsp;Cisco&nbsp;Systems</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="datetime.html">datetime</a><br>
+<a href="json.html">json</a><br>
+</td><td width="25%" valign=top><a href="logging.html">logging</a><br>
+<a href="requests.html">requests</a><br>
+</td><td width="25%" valign=top><a href="select.html">select</a><br>
+<a href="sys.html">sys</a><br>
+</td><td width="25%" valign=top><a href="time.html">time</a><br>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-add_spark_room_membership"><strong>add_spark_room_membership</strong></a>(room_id, email_invite)</dt><dd><tt>This&nbsp;function&nbsp;will&nbsp;add&nbsp;membership&nbsp;to&nbsp;the&nbsp;Spark&nbsp;room&nbsp;with&nbsp;the&nbsp;room&nbsp;Id<br>
+Call&nbsp;to&nbsp;Spark&nbsp;-&nbsp;/memberships<br>
+:param&nbsp;room_Id:&nbsp;Spark&nbsp;room&nbsp;Id<br>
+:param&nbsp;email_invite:&nbsp;email&nbsp;address&nbsp;to&nbsp;invite<br>
+:return:</tt></dd></dl>
+ <dl><dt><a name="-create_asav_access_list"><strong>create_asav_access_list</strong></a>(acl_id, interface_name, client_ip)</dt><dd><tt>Insert&nbsp;in&nbsp;line&nbsp;1&nbsp;a&nbsp;new&nbsp;ACL&nbsp;entry&nbsp;to&nbsp;existing&nbsp;interface&nbsp;ACL<br>
+Call&nbsp;to&nbsp;ASAv&nbsp;-&nbsp;/api/access/in/{interfaceId}/rules,&nbsp;post&nbsp;method<br>
+:param&nbsp;acl_id:&nbsp;ASA&nbsp;ACL&nbsp;id&nbsp;number<br>
+:param&nbsp;interface_name:&nbsp;ASA&nbsp;interface_name<br>
+:param&nbsp;client_ip:&nbsp;client&nbsp;IP<br>
+:return:&nbsp;Response&nbsp;Code&nbsp;-&nbsp;201&nbsp;if&nbsp;successful</tt></dd></dl>
+ <dl><dt><a name="-create_path_visualisation_apic_em"><strong>create_path_visualisation_apic_em</strong></a>(src_ip, dest_ip, ticket)</dt><dd><tt>This&nbsp;function&nbsp;will&nbsp;create&nbsp;a&nbsp;new&nbsp;Path&nbsp;Visualisation&nbsp;between&nbsp;the&nbsp;source&nbsp;IP&nbsp;address&nbsp;{src_ip}&nbsp;and&nbsp;the<br>
+destination&nbsp;IP&nbsp;address&nbsp;{dest_ip}<br>
+:param&nbsp;src_ip:&nbsp;Source&nbsp;IP&nbsp;address<br>
+:param&nbsp;dest_ip:&nbsp;Destination&nbsp;IP&nbsp;address<br>
+:param&nbsp;ticket:&nbsp;APIC-EM&nbsp;ticket<br>
+:return:&nbsp;APIC-EM&nbsp;path&nbsp;visualisation&nbsp;id</tt></dd></dl>
+ <dl><dt><a name="-create_spark_room"><strong>create_spark_room</strong></a>(room_name)</dt><dd><tt>This&nbsp;function&nbsp;will&nbsp;create&nbsp;a&nbsp;Spark&nbsp;room&nbsp;with&nbsp;the&nbsp;title&nbsp;room&nbsp;name<br>
+Call&nbsp;to&nbsp;Spark&nbsp;-&nbsp;/rooms<br>
+:param&nbsp;room_name:&nbsp;Spark&nbsp;room&nbsp;name<br>
+:return:&nbsp;Spark&nbsp;room&nbsp;Id</tt></dd></dl>
+ <dl><dt><a name="-delete_asav_access_list"><strong>delete_asav_access_list</strong></a>(acl_id, interface_name)</dt><dd><tt>Delete&nbsp;ACL&nbsp;entry&nbsp;line&nbsp;1&nbsp;to&nbsp;existing&nbsp;interface&nbsp;ACL<br>
+Call&nbsp;to&nbsp;ASAv&nbsp;-&nbsp;/api/access/in/{interfaceId}/rules,&nbsp;delete&nbsp;method<br>
+:param&nbsp;acl_id:&nbsp;ASA&nbsp;ACL&nbsp;id&nbsp;number<br>
+:param&nbsp;interface_name:&nbsp;ASA&nbsp;interface_name<br>
+:return:&nbsp;Response&nbsp;Code&nbsp;-&nbsp;None&nbsp;if&nbsp;successful</tt></dd></dl>
+ <dl><dt><a name="-delete_spark_room"><strong>delete_spark_room</strong></a>(room_id)</dt><dd><tt>This&nbsp;function&nbsp;will&nbsp;delete&nbsp;the&nbsp;Spark&nbsp;room&nbsp;with&nbsp;the&nbsp;room&nbsp;Id<br>
+Call&nbsp;to&nbsp;Spark&nbsp;-&nbsp;/rooms<br>
+:param&nbsp;room_id:&nbsp;Spark&nbsp;room&nbsp;Id<br>
+:return:</tt></dd></dl>
+ <dl><dt><a name="-execute_ucsd_workflow"><strong>execute_ucsd_workflow</strong></a>(UCSD_key, workflow_name)</dt><dd><tt>Execute&nbsp;an&nbsp;UCSD&nbsp;workflow<br>
+Call&nbsp;to&nbsp;UCSD,&nbsp;/app/api/rest?formatType=json&amp;opName=userAPISubmitWorkflowServiceRequest&amp;opData=<br>
+:param&nbsp;UCSD_key:&nbsp;UCSD&nbsp;user&nbsp;API&nbsp;key<br>
+:param&nbsp;workflow_name:&nbsp;workflow&nbsp;name,&nbsp;parameters&nbsp;if&nbsp;needed<br>
+:return:</tt></dd></dl>
+ <dl><dt><a name="-find_spark_room_id"><strong>find_spark_room_id</strong></a>(room_name)</dt><dd><tt>This&nbsp;function&nbsp;will&nbsp;find&nbsp;the&nbsp;Spark&nbsp;room&nbsp;id&nbsp;based&nbsp;on&nbsp;the&nbsp;room&nbsp;name<br>
+Call&nbsp;to&nbsp;Spark&nbsp;-&nbsp;/rooms<br>
+:param&nbsp;room_name:&nbsp;Spark&nbsp;room&nbsp;name<br>
+:return:&nbsp;the&nbsp;Spark&nbsp;room&nbsp;Id</tt></dd></dl>
+ <dl><dt><a name="-get_asav_access_list"><strong>get_asav_access_list</strong></a>(interface_name)</dt><dd><tt>Find&nbsp;out&nbsp;the&nbsp;existing&nbsp;ASAv&nbsp;interface&nbsp;Access&nbsp;Control&nbsp;List<br>
+Call&nbsp;to&nbsp;ASAv&nbsp;-&nbsp;/api/access/in/{interfaceId}/rules<br>
+:param&nbsp;interface_name:&nbsp;ASA&nbsp;interface_name<br>
+:return:&nbsp;Access&nbsp;Control&nbsp;List&nbsp;id&nbsp;number</tt></dd></dl>
+ <dl><dt><a name="-get_device_id_apic_em"><strong>get_device_id_apic_em</strong></a>(device_name, ticket)</dt><dd><tt>This&nbsp;function&nbsp;will&nbsp;find&nbsp;the&nbsp;APIC-EM&nbsp;device&nbsp;id&nbsp;for&nbsp;the&nbsp;device&nbsp;with&nbsp;the&nbsp;name&nbsp;{device_name}<br>
+:param&nbsp;device_name:&nbsp;device&nbsp;hostname<br>
+:param&nbsp;ticket:&nbsp;APIC-EM&nbsp;ticket<br>
+:return:&nbsp;APIC-EM&nbsp;device&nbsp;id</tt></dd></dl>
+ <dl><dt><a name="-get_hostname_id_apic_em"><strong>get_hostname_id_apic_em</strong></a>(device_id, ticket)</dt><dd><tt>Find&nbsp;out&nbsp;the&nbsp;hostname&nbsp;of&nbsp;the&nbsp;network&nbsp;device&nbsp;with&nbsp;the&nbsp;specified&nbsp;device&nbsp;ID<br>
+Call&nbsp;to&nbsp;APIC-EM&nbsp;-&nbsp;network-device/{id}<br>
+:param&nbsp;device_id:&nbsp;APIC-EM&nbsp;device&nbsp;Id<br>
+:param&nbsp;ticket:&nbsp;APIC-EM&nbsp;ticket<br>
+:return:&nbsp;hostname&nbsp;and&nbsp;the&nbsp;device&nbsp;type&nbsp;of&nbsp;the&nbsp;network&nbsp;device</tt></dd></dl>
+ <dl><dt><a name="-get_input_ip"><strong>get_input_ip</strong></a>()</dt><dd><tt>This&nbsp;function&nbsp;will&nbsp;ask&nbsp;the&nbsp;user&nbsp;to&nbsp;input&nbsp;the&nbsp;IP&nbsp;address.&nbsp;The&nbsp;format&nbsp;of&nbsp;the&nbsp;IP&nbsp;address&nbsp;is&nbsp;not&nbsp;validated<br>
+The&nbsp;function&nbsp;will&nbsp;return&nbsp;the&nbsp;IP&nbsp;address<br>
+:return:&nbsp;the&nbsp;IP&nbsp;address</tt></dd></dl>
+ <dl><dt><a name="-get_input_mac"><strong>get_input_mac</strong></a>()</dt><dd><tt>This&nbsp;function&nbsp;will&nbsp;ask&nbsp;the&nbsp;user&nbsp;to&nbsp;input&nbsp;the&nbsp;IP&nbsp;address.&nbsp;The&nbsp;format&nbsp;of&nbsp;the&nbsp;IP&nbsp;address&nbsp;is&nbsp;not&nbsp;validated<br>
+The&nbsp;function&nbsp;will&nbsp;return&nbsp;the&nbsp;IP&nbsp;address<br>
+:return:&nbsp;the&nbsp;IP&nbsp;address</tt></dd></dl>
+ <dl><dt><a name="-get_input_timeout"><strong>get_input_timeout</strong></a>(message, wait_time)</dt><dd><tt>This&nbsp;function&nbsp;will&nbsp;ask&nbsp;the&nbsp;user&nbsp;to&nbsp;input&nbsp;the&nbsp;value&nbsp;requested&nbsp;in&nbsp;the&nbsp;{message},&nbsp;in&nbsp;the&nbsp;time&nbsp;specified&nbsp;{time}<br>
+:param&nbsp;message:&nbsp;message&nbsp;to&nbsp;provide&nbsp;the&nbsp;user&nbsp;information&nbsp;on&nbsp;what&nbsp;is&nbsp;required<br>
+:param&nbsp;wait_time:&nbsp;time&nbsp;limit&nbsp;for&nbsp;the&nbsp;user&nbsp;input<br>
+:return:&nbsp;user&nbsp;input&nbsp;as&nbsp;string</tt></dd></dl>
+ <dl><dt><a name="-get_path_visualisation_info"><strong>get_path_visualisation_info</strong></a>(path_id, ticket)</dt><dd><tt>This&nbsp;function&nbsp;will&nbsp;return&nbsp;the&nbsp;path&nbsp;visualisation&nbsp;details&nbsp;for&nbsp;the&nbsp;APIC-EM&nbsp;path&nbsp;visualisation&nbsp;{id}<br>
+:param&nbsp;path_id:&nbsp;APIC-EM&nbsp;path&nbsp;visualisation&nbsp;id<br>
+:param&nbsp;ticket:&nbsp;APIC-EM&nbsp;ticket<br>
+:return:&nbsp;Path&nbsp;visualisation&nbsp;details&nbsp;in&nbsp;a&nbsp;list&nbsp;[device,interface_out,interface_in,device...]</tt></dd></dl>
+ <dl><dt><a name="-get_service_ticket_apic_em"><strong>get_service_ticket_apic_em</strong></a>()</dt><dd><tt>create&nbsp;the&nbsp;authorization&nbsp;ticket&nbsp;required&nbsp;to&nbsp;access&nbsp;APIC-EM<br>
+Call&nbsp;to&nbsp;APIC-EM&nbsp;-&nbsp;/ticket<br>
+:return:&nbsp;ticket</tt></dd></dl>
+ <dl><dt><a name="-get_ucsd_api_key"><strong>get_ucsd_api_key</strong></a>()</dt><dd><tt>Create&nbsp;a&nbsp;UCSD&nbsp;user&nbsp;api&nbsp;key&nbsp;for&nbsp;authentication&nbsp;of&nbsp;the&nbsp;UCSD&nbsp;API's&nbsp;requests<br>
+Call&nbsp;to&nbsp;UCSD,&nbsp;/app/api/rest?formatType=json&amp;opName=getRESTKey&amp;user=<br>
+:return:&nbsp;the&nbsp;UCSD&nbsp;user&nbsp;API&nbsp;Key</tt></dd></dl>
+ <dl><dt><a name="-last_spark_room_message"><strong>last_spark_room_message</strong></a>(room_id)</dt><dd><tt>This&nbsp;function&nbsp;will&nbsp;find&nbsp;the&nbsp;last&nbsp;message&nbsp;from&nbsp;the&nbsp;Spark&nbsp;room&nbsp;with&nbsp;the&nbsp;room&nbsp;Id<br>
+Call&nbsp;to&nbsp;Spark&nbsp;-&nbsp;/messages<br>
+:param&nbsp;room_Id:&nbsp;Spark&nbsp;room&nbsp;Id<br>
+:return:&nbsp;last&nbsp;message&nbsp;and&nbsp;person&nbsp;email&nbsp;in&nbsp;the&nbsp;room</tt></dd></dl>
+ <dl><dt><a name="-locate_client_apic_em"><strong>locate_client_apic_em</strong></a>(client_ip, ticket)</dt><dd><tt>Locate&nbsp;a&nbsp;wired&nbsp;client&nbsp;device&nbsp;in&nbsp;the&nbsp;infrastructure&nbsp;by&nbsp;using&nbsp;the&nbsp;client&nbsp;IP&nbsp;address<br>
+Call&nbsp;to&nbsp;APIC-EM&nbsp;-&nbsp;/host<br>
+:param&nbsp;client_ip:&nbsp;Client&nbsp;IP&nbsp;Address<br>
+:param&nbsp;ticket:&nbsp;APIC-EM&nbsp;ticket<br>
+:return:&nbsp;hostname,&nbsp;interface_name,&nbsp;vlan_Id</tt></dd></dl>
+ <dl><dt><a name="-main"><strong>main</strong></a>()</dt><dd><tt>Vendor&nbsp;will&nbsp;join&nbsp;Spark&nbsp;Room&nbsp;with&nbsp;the&nbsp;name&nbsp;{ROOM_NAME}<br>
+It&nbsp;will&nbsp;ask&nbsp;for&nbsp;access&nbsp;to&nbsp;an&nbsp;IP-enabled&nbsp;device&nbsp;-&nbsp;named&nbsp;{IPD}<br>
+The&nbsp;code&nbsp;will&nbsp;map&nbsp;this&nbsp;IP-enabled&nbsp;device&nbsp;to&nbsp;the&nbsp;IP&nbsp;address&nbsp;{172.16.41.55}<br>
+Access&nbsp;will&nbsp;be&nbsp;provisioned&nbsp;to&nbsp;allow&nbsp;connectivity&nbsp;from&nbsp;DMZ&nbsp;VDI&nbsp;to&nbsp;IPD</tt></dd></dl>
+ <dl><dt><a name="-pi_clone_cli_template"><strong>pi_clone_cli_template</strong></a>(file)</dt><dd><tt>This&nbsp;function&nbsp;will&nbsp;clone&nbsp;an&nbsp;existing&nbsp;CLI&nbsp;template&nbsp;with&nbsp;the&nbsp;name&nbsp;{file}.&nbsp;The&nbsp;new&nbsp;CLI&nbsp;template&nbsp;name&nbsp;will&nbsp;have<br>
+the&nbsp;name&nbsp;DATETIME+{file}<br>
+:param&nbsp;file:&nbsp;file&nbsp;that&nbsp;contains&nbsp;the&nbsp;CLI&nbsp;template<br>
+:return:&nbsp;will&nbsp;save&nbsp;the&nbsp;DATETIME+{file}&nbsp;file&nbsp;with&nbsp;the&nbsp;template&nbsp;to&nbsp;be&nbsp;deployed</tt></dd></dl>
+ <dl><dt><a name="-pi_delete_cli_template"><strong>pi_delete_cli_template</strong></a>(cli_template_name)</dt><dd><tt>This&nbsp;function&nbsp;will&nbsp;delete&nbsp;the&nbsp;PI&nbsp;CLI&nbsp;template&nbsp;with&nbsp;the&nbsp;name&nbsp;{cli_template_name}<br>
+API&nbsp;call&nbsp;to&nbsp;/webacs/api/v1/op/cliTemplateConfiguration/deleteTemplate<br>
+:param&nbsp;cli_template_name:&nbsp;the&nbsp;CLI&nbsp;template&nbsp;to&nbsp;be&nbsp;deleted<br>
+:return:&nbsp;none</tt></dd></dl>
+ <dl><dt><a name="-pi_deploy_cli_template"><strong>pi_deploy_cli_template</strong></a>(device_id, template_name, variable_value)</dt><dd><tt>Deploy&nbsp;a&nbsp;template&nbsp;to&nbsp;a&nbsp;device&nbsp;through&nbsp;Job<br>
+Call&nbsp;to&nbsp;Prime&nbsp;Infrastructure&nbsp;-&nbsp;/webacs/api/v1/op/cliTemplateConfiguration/deployTemplateThroughJob<br>
+:param&nbsp;device_id:&nbsp;PI&nbsp;device&nbsp;id<br>
+:param&nbsp;template_name:&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;template&nbsp;to&nbsp;be&nbsp;deployed<br>
+:param&nbsp;variable_value:&nbsp;the&nbsp;values&nbsp;of&nbsp;the&nbsp;variables,&nbsp;if&nbsp;needed<br>
+:return:&nbsp;PI&nbsp;job&nbsp;name</tt></dd></dl>
+ <dl><dt><a name="-pi_get_cli_template"><strong>pi_get_cli_template</strong></a>(template)</dt><dd><tt>This&nbsp;function&nbsp;will&nbsp;check&nbsp;if&nbsp;PI&nbsp;has&nbsp;already&nbsp;a&nbsp;CLI&nbsp;template&nbsp;with&nbsp;the&nbsp;name&nbsp;{template}<br>
+:param&nbsp;template:&nbsp;PI&nbsp;CLI&nbsp;template&nbsp;name<br>
+:return:&nbsp;{None}&nbsp;if&nbsp;the&nbsp;template&nbsp;does&nbsp;not&nbsp;exist,&nbsp;{template&nbsp;id}&nbsp;if&nbsp;template&nbsp;exists</tt></dd></dl>
+ <dl><dt><a name="-pi_get_device_id"><strong>pi_get_device_id</strong></a>(device_name)</dt><dd><tt>Find&nbsp;out&nbsp;the&nbsp;PI&nbsp;device&nbsp;Id&nbsp;using&nbsp;the&nbsp;device&nbsp;hostname<br>
+Call&nbsp;to&nbsp;Prime&nbsp;Infrastructure&nbsp;-&nbsp;/webacs/api/v1/data/Devices,&nbsp;filtered&nbsp;using&nbsp;the&nbsp;Device&nbsp;Hostname<br>
+:param&nbsp;device_name:&nbsp;device&nbsp;hostname<br>
+:return:&nbsp;PI&nbsp;device&nbsp;Id</tt></dd></dl>
+ <dl><dt><a name="-pi_get_job_status"><strong>pi_get_job_status</strong></a>(job_name)</dt><dd><tt>Get&nbsp;job&nbsp;status&nbsp;in&nbsp;PI<br>
+Call&nbsp;to&nbsp;Prime&nbsp;Infrastructure&nbsp;-&nbsp;/webacs/api/v1/data/JobSummary,&nbsp;filtered&nbsp;by&nbsp;the&nbsp;job&nbsp;name,&nbsp;will&nbsp;provide&nbsp;the&nbsp;job&nbsp;id<br>
+A&nbsp;second&nbsp;call&nbsp;to&nbsp;/webacs/api/v1/data/JobSummary&nbsp;using&nbsp;the&nbsp;job&nbsp;id<br>
+:param&nbsp;job_name:&nbsp;Prime&nbsp;Infrastructure&nbsp;job&nbsp;name<br>
+:return:&nbsp;PI&nbsp;job&nbsp;status</tt></dd></dl>
+ <dl><dt><a name="-pi_update_cli_template"><strong>pi_update_cli_template</strong></a>(vlan_id, remote_client, file)</dt><dd><tt>This&nbsp;function&nbsp;will&nbsp;update&nbsp;an&nbsp;existing&nbsp;CLI&nbsp;template&nbsp;with&nbsp;the&nbsp;values&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;deployment<br>
+:param&nbsp;vlan_id:&nbsp;VLAN&nbsp;ID&nbsp;of&nbsp;the&nbsp;remote&nbsp;client<br>
+:param&nbsp;remote_client:&nbsp;IP&nbsp;address&nbsp;for&nbsp;the&nbsp;remote&nbsp;client<br>
+:param&nbsp;file:&nbsp;file&nbsp;that&nbsp;contains&nbsp;the&nbsp;CLI&nbsp;template<br>
+:return:&nbsp;will&nbsp;save&nbsp;the&nbsp;DATETIME+{file}&nbsp;file&nbsp;with&nbsp;the&nbsp;template&nbsp;to&nbsp;be&nbsp;deployed</tt></dd></dl>
+ <dl><dt><a name="-pi_upload_cli_template"><strong>pi_upload_cli_template</strong></a>(cli_file_name, cli_template, list_variables)</dt><dd><tt>This&nbsp;function&nbsp;will&nbsp;upload&nbsp;a&nbsp;new&nbsp;CLI&nbsp;template&nbsp;from&nbsp;the&nbsp;text&nbsp;file&nbsp;{cli_file_name}.<br>
+It&nbsp;will&nbsp;check&nbsp;if&nbsp;the&nbsp;PI&nbsp;CLI&nbsp;template&nbsp;exists&nbsp;and&nbsp;if&nbsp;yes,&nbsp;it&nbsp;will&nbsp;delete&nbsp;the&nbsp;CLI&nbsp;template<br>
+API&nbsp;call&nbsp;to&nbsp;/webacs/api/v1/op/cliTemplateConfiguration/upload<br>
+:param&nbsp;list_variables:&nbsp;variables&nbsp;to&nbsp;be&nbsp;sent&nbsp;to&nbsp;Prime,&nbsp;required&nbsp;by&nbsp;the&nbsp;template<br>
+:param&nbsp;cli_template:&nbsp;CLI&nbsp;template&nbsp;name<br>
+:param&nbsp;cli_file_name:&nbsp;cli&nbsp;template&nbsp;text&nbsp;file<br>
+:return:&nbsp;the&nbsp;cli_template_id</tt></dd></dl>
+ <dl><dt><a name="-post_spark_room_message"><strong>post_spark_room_message</strong></a>(room_id, message)</dt><dd><tt>This&nbsp;function&nbsp;will&nbsp;post&nbsp;a&nbsp;message&nbsp;to&nbsp;the&nbsp;Spark&nbsp;room&nbsp;with&nbsp;the&nbsp;room&nbsp;Id<br>
+Call&nbsp;to&nbsp;Spark&nbsp;-&nbsp;/messages<br>
+:param&nbsp;room_id:&nbsp;Spark&nbsp;room&nbsp;Id<br>
+:param&nbsp;message:&nbsp;message<br>
+:return:</tt></dd></dl>
+ <dl><dt><a name="-pprint"><strong>pprint</strong></a>(json_data)</dt><dd><tt>Pretty&nbsp;print&nbsp;JSON&nbsp;formatted&nbsp;data<br>
+:param&nbsp;json_data:<br>
+:return:</tt></dd></dl>
+ <dl><dt><a name="-sync_device_apic_em"><strong>sync_device_apic_em</strong></a>(device_name, ticket)</dt><dd><tt>This&nbsp;function&nbsp;will&nbsp;sync&nbsp;the&nbsp;device&nbsp;configuration&nbsp;from&nbsp;the&nbsp;device&nbsp;with&nbsp;the&nbsp;name&nbsp;{device_name}<br>
+:param&nbsp;device_name:&nbsp;device&nbsp;hostname<br>
+:param&nbsp;ticket:&nbsp;APIC-EM&nbsp;ticket<br>
+:return:&nbsp;the&nbsp;response,&nbsp;202&nbsp;if&nbsp;sync&nbsp;initiated</tt></dd></dl>
+ <dl><dt><a name="-tropo_notification"><strong>tropo_notification</strong></a>()</dt><dd><tt>This&nbsp;function&nbsp;will&nbsp;call&nbsp;Tropo&nbsp;for&nbsp;to&nbsp;trigger&nbsp;a&nbsp;voice&nbsp;notification<br>
+The&nbsp;ERNA.py&nbsp;script&nbsp;is&nbsp;hosted&nbsp;by&nbsp;Tropo:<br>
+-----<br>
+call&nbsp;("+1&nbsp;XXX&nbsp;XXX&nbsp;XXXX")<br>
+say&nbsp;("The&nbsp;requested&nbsp;access&nbsp;has&nbsp;been&nbsp;granted")<br>
+-----<br>
+We&nbsp;will&nbsp;send&nbsp;a&nbsp;get&nbsp;request&nbsp;to&nbsp;launch&nbsp;this&nbsp;script&nbsp;that&nbsp;will&nbsp;call&nbsp;a&nbsp;phone&nbsp;number.<br>
+Tropo&nbsp;voice&nbsp;will&nbsp;read&nbsp;the&nbsp;message.<br>
+:return:</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>ASAv_AUTH</strong> = &lt;requests.auth.HTTPBasicAuth object&gt;<br>
+<strong>ASAv_CLIENT</strong> = '172.16.41.55'<br>
+<strong>ASAv_PASSW</strong> = 'cisco'<br>
+<strong>ASAv_REMOTE_CLIENT</strong> = '172.16.203.50'<br>
+<strong>ASAv_URL</strong> = 'https://172.16.11.5'<br>
+<strong>ASAv_USER</strong> = 'python'<br>
+<strong>CLI_DATE_TIME</strong> = None<br>
+<strong>CMX_AUTH</strong> = &lt;requests.auth.HTTPBasicAuth object&gt;<br>
+<strong>CMX_PASSW</strong> = 'Clive!17'<br>
+<strong>CMX_URL</strong> = 'https://172.16.11.27/'<br>
+<strong>CMX_USER</strong> = 'python'<br>
+<strong>EM_PASSW</strong> = 'Clive.17'<br>
+<strong>EM_URL</strong> = 'https://172.16.11.30/api/v1'<br>
+<strong>EM_USER</strong> = 'python'<br>
+<strong>PI_AUTH</strong> = &lt;requests.auth.HTTPBasicAuth object&gt;<br>
+<strong>PI_PASSW</strong> = 'Clive.17'<br>
+<strong>PI_URL</strong> = 'https://172.16.11.25'<br>
+<strong>PI_USER</strong> = 'python'<br>
+<strong>ROOM_NAME</strong> = 'ERNA'<br>
+<strong>SPARK_AUTH</strong> = 'Bearer OTkyMTU2NGUtYjkzZi00OTQ3LTlj...'<br>
+<strong>SPARK_URL</strong> = 'https://api.ciscospark.com/v1'<br>
+<strong>TROPO_KEY</strong> = '58456f49686444754646556a694f556...'<br>
+<strong>UCSD_CONNECT_FLOW</strong> = 'Gabi_VM_Connect_VLAN_10'<br>
+<strong>UCSD_DISCONNECT_FLOW</strong> = 'Gabi_VM_Disconnect_VLAN_10'<br>
+<strong>UCSD_KEY</strong> = '1D3FD49A0D474481AE7A4C6BD33EC82E'<br>
+<strong>UCSD_PASSW</strong> = 'cisco.123'<br>
+<strong>UCSD_URL</strong> = 'https://10.94.132.69'<br>
+<strong>UCSD_USER</strong> = 'gzapodea'</td></tr></table>
+</body></html>
