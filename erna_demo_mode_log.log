@@ -109,6 +109,7 @@ Wait for PI to complete template deployments
 DC router restore configurations status:  SUCCESS
 Remote router restore configurations status:  SUCCESS
 ASAv access list allowing traffic from  172.16.203.50  to  172.16.41.55  deleted
+
 End of application run
 
 Process finished with exit code 0
