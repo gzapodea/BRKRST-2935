@@ -769,8 +769,11 @@ def main():
 
     ucsd_key = get_ucsd_api_key()
 
-    execute UCSD workflow to connect VDI to VLAN, power on VDI
+    # execute UCSD workflow to connect VDI to VLAN, power on VDI
+
     execute_ucsd_workflow(ucsd_key, UCSD_CONNECT_FLOW)
+
+    print('UCSD connect flow executed')
 
     # get the APIC-EM auth ticket
 
@@ -979,6 +982,11 @@ def main():
         print('ASAv access list allowing traffic from ', ASAv_REMOTE_CLIENT, ' to ', client_ip, ' deleted')
     else:
         print('Error deleting the ASAv access list allowing traffic from ', ASAv_REMOTE_CLIENT, ' to ', client_ip)
+
+    # execute UCSD workflow to discoconnect VDI to VLAN, power on VDI
+    execute_ucsd_workflow(ucsd_key, UCSD_DISCONNECT_FLOW)
+
+    print('UCSD disconnect flow executed')
 
     # restore the stdout to initial value
     sys.stdout = initial_sys
