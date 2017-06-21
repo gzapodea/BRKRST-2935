@@ -767,10 +767,10 @@ def main():
 
     # get UCSD API key
 
-    # ucsd_key = get_ucsd_api_key()
+    ucsd_key = get_ucsd_api_key()
 
-    # execute UCSD workflow to connect VDI to VLAN, power on VDI
-    # execute_ucsd_workflow(ucsd_key, UCSD_CONNECT_FLOW)
+    execute UCSD workflow to connect VDI to VLAN, power on VDI
+    execute_ucsd_workflow(ucsd_key, UCSD_CONNECT_FLOW)
 
     # get the APIC-EM auth ticket
 
