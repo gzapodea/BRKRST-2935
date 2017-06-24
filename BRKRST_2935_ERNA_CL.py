@@ -334,7 +334,7 @@ def sync_device_apic_em(device_name, ticket):
     This function will sync the device configuration from the device with the name {device_name}
     :param device_name: device hostname
     :param ticket: APIC-EM ticket
-    :return: the response, 202 if sync initiated
+    :return: the response status code, 202 if sync initiated
     """
 
     device_id = get_device_id_apic_em(device_name, ticket)
@@ -992,6 +992,7 @@ def main():
     sys.stdout = initial_sys
 
     print('End of application run')
+
 
 if __name__ == '__main__':
     main()
